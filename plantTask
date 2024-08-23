@@ -1,0 +1,85 @@
+import	org.firmata4j.Pin;
+import	org.firmata4j.ssd1306.SSD1306;
+import edu.princeton.cs.introcs.StdDraw;
+import java.io.IOException;
+import java.util.ArrayList;
+import	java.util.TimerTask;
+public	class plantTask extends	TimerTask	{
+    private final SSD1306 Oled;
+    private Pin soilSensor;
+    private Pin pump;
+    private Pin button;
+    //constructor for plantTask
+    public plantTask(Pin soilSensor, SSD1306 aDisplayObject,Pin pump,Pin button){
+        this.soilSensor=soilSensor;
+        this.Oled=aDisplayObject;
+        this.pump=pump;
+        this.button=button;
+    }
+    //this creates an array list of long type for the soil moisture values
+    ArrayList<Long> values= new ArrayList<>();
+    @Override
+    public	void run() {
+        //this reads the soil moisture sensor value
+            long soilValue =  soilSensor.getValue();
+            //this adds the read value to the array list
+            values.add(soilValue);
+            //this prints out the array as the soil moisture values are added to it
+            System.out.println(values);
+          //this runs if the moisture value is more than 690 which means it is dry
+            if (soilValue > 690) {
+                try {
+                    //this turns on the pump
+                    pump.setValue(1);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //this gives the text to display on the Oled
+               Oled.getCanvas().drawString(0, 0, "Soil is dry.Pump on  ");
+            }
+            //this runs if the moisture value is more than or equal to 650 and less than and equal to 690 which means it is moist
+            else if ((soilValue > 650|| soilValue==650) && (soilValue < 690 || soilValue == 690)) {
+                try {
+                    //this turns on the pump
+                    pump.setValue(1);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //this gives the text to display on the Oled
+                Oled.getCanvas().drawString(0, 0, "Soil is moist.Pump on  ");
+            }
+            //this runs if the moisture value is less than 650 which means it is wet
+            else if (soilValue < 650) {
+                try {
+                    //this turns off the pump
+                    pump.setValue(0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //this gives the text to display on the Oled
+                Oled.getCanvas().drawString(0, 0, "Soil is wet. Pump off");
+            }
+            //this displays the text on the Oled
+            Oled.display();
+            //this creates a for loop to graph the points.
+            for (int i = 0; i < values.size(); i++) {
+                //this plots the x and y points as an asterisk
+                // x is the time value and I'm using i+1 because the task is executed every 1 second so since i starts from 0, it will start plotting from 1 second
+                StdDraw.text(i+1, values.get(i), "*");
+            }
+            //to get the button status
+         long buttonValue= button.getValue();
+            // 1 means button is pressed
+         if(buttonValue==1){
+            try {
+                //this turns off the pump
+                pump.setValue(0);
+                //this terminates the program
+                System.exit(0);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+            }
+        }
