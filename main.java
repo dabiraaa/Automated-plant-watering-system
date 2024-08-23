@@ -62,24 +62,6 @@ public class main{
        // this sets the pen color for plotting the graph points
         StdDraw.setPenColor(StdDraw.RED);
     }
-    //for the testing
-    public static int getValue(int testValue){
-        int pump=0;
-        //if the moisture value is more than 690 which means it is dry,pump is on
-        if (testValue > 690) {
-            pump=1;
-        }
-        //if the moisture value is more than or equal to 650 and less than or equal to 690 which means it is moist,the pump is on
-        else if ((testValue > 650|| testValue==650) && (testValue < 690 ||testValue == 690)) {
-            pump=1;
-        }
-        // if the moisture value is less than 650 which means it is wet,pump is off
-        else if (testValue < 650) {
-            pump=0;
-        }
-
-        return pump;
-    }
-
+   
 }
 
